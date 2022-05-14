@@ -9,7 +9,6 @@
 
 import socket
 import constants
-import tqdm
 import os
 
 client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -28,13 +27,30 @@ def main():
         if command_to_send == '':
             print('Please input a valid command...')
             command_to_send = input()                        
-        elif (command_to_send == constants.DATA):
+        elif (command_to_send == constants.DELETE):
             data_to_send = input('Input data to send: ') 
             command_and_data_to_send = command_to_send + ' ' + data_to_send
             client_socket.send(bytes(command_and_data_to_send,constants.ENCONDING_FORMAT))
             data_received = client_socket.recv(constants.RECV_BUFFER_SIZE)        
             print(data_received.decode(constants.ENCONDING_FORMAT))
-            command_to_send = input()            
+            command_to_send = input()      
+        
+        elif (command_to_send == constants.GET):
+            data_to_send = input('Input data to send: ') 
+            command_and_data_to_send = command_to_send + ' ' + data_to_send
+            client_socket.send(bytes(command_and_data_to_send,constants.ENCONDING_FORMAT))
+            data_received = client_socket.recv(constants.RECV_BUFFER_SIZE)        
+            print(data_received.decode(constants.ENCONDING_FORMAT))
+            command_to_send = input()  
+
+        elif (command_to_send == constants.POST):
+            data_to_send = input('Input data to send: ') 
+            command_and_data_to_send = command_to_send + ' ' + data_to_send
+            client_socket.send(bytes(command_and_data_to_send,constants.ENCONDING_FORMAT))
+            data_received = client_socket.recv(constants.RECV_BUFFER_SIZE)        
+            print(data_received.decode(constants.ENCONDING_FORMAT))
+            command_to_send = input()   
+        
         else:        
             client_socket.send(bytes(command_to_send,constants.ENCONDING_FORMAT))
             data_received = client_socket.recv(constants.RECV_BUFFER_SIZE)        

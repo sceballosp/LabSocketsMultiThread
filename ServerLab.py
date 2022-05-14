@@ -6,11 +6,12 @@
 
 # Import libraries for networking communication and concurrency...
 
+from fileinput import filename
 import socket
 import threading
 import constants
-import tqdm
 import os
+import shutil
 
 # Defining a socket object...
 server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -37,23 +38,27 @@ def handler_client_connection(client_connection,client_address):
         print(command)
         
         if (command == constants.DELETE):
-
+            file = constants.PATH #+ f '/{ remote_command [1] }'
             try:
-                os.remove('files/index.html')
+                os.remove('file')
                 response = '200 OK\n'
             except ValueError:
                 response = '500 Internal Server Error\n'
 
             client_connection.sendall(response.encode(constants.ENCONDING_FORMAT))
 
-        elif (command == constants.QUIT):
-            response = '200 BYE\n'
-            client_connection.sendall(response.encode(constants.ENCONDING_FORMAT))
-            is_connected = False
-        elif (command == constants.DATA):
-            response = "300 DRCV\n"
-            client_connection.sendall(response.encode(constants.ENCONDING_FORMAT))
-        else:
+        elif (command == constants.GET):
+            filename = remote_command[1]
+
+            try: 
+                shutil.copy(file, constants.PATH)
+                client_connection.send("[400] FILE UPLOADED".encode(constants.ENCONDING_FORMAT))
+            except:
+                client_connection.send("[400] FILED TO UPLOADED".encode(constants.ENCONDING_FORMAT))
+
+        
+        elif (command == constants.HEAD):
+ 
             response = '400 BCMD\n\rCommand-Description: Bad command\n\r'
             client_connection.sendall(response.encode(constants.ENCONDING_FORMAT))
     
@@ -68,6 +73,7 @@ def server_execution():
     print ('Socket is bind to address and port...')
     server_socket.listen(5)
     print('Socket is listening...')
+    constants.PATH 
     while True:
         client_connection, client_address = server_socket.accept()
         client_thread = threading.Thread(target=handler_client_connection, args=(client_connection,client_address))
