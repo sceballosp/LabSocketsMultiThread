@@ -9,6 +9,8 @@
 import socket
 import threading
 import constants
+import tqdm
+import os
 
 # Defining a socket object...
 server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -34,9 +36,16 @@ def handler_client_connection(client_connection,client_address):
         print (f'Data received from: {client_address[0]}:{client_address[1]}')
         print(command)
         
-        if (command == constants.HELO):
-            response = '100 OK\n'
+        if (command == constants.DELETE):
+
+            try:
+                os.remove('files/index.html')
+                response = '200 OK\n'
+            except ValueError:
+                response = '500 Internal Server Error\n'
+
             client_connection.sendall(response.encode(constants.ENCONDING_FORMAT))
+
         elif (command == constants.QUIT):
             response = '200 BYE\n'
             client_connection.sendall(response.encode(constants.ENCONDING_FORMAT))

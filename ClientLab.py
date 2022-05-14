@@ -9,6 +9,8 @@
 
 import socket
 import constants
+import tqdm
+import os
 
 client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
