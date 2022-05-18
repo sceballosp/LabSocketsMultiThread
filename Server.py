@@ -3,6 +3,7 @@ import threading
 import Constantes
 import os
 from setuptools import Command
+import shutil
 
 HEADER = 1024
 PORT = 5050
@@ -12,6 +13,20 @@ FORMAT = 'utf-8'
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+def tipo_archivo(file):
+
+    if(file.endswith('.jpg')):
+        mimetype = 'image/jpg'
+    elif(file.endswith('.css')):
+        mimetype = 'text/css'
+    elif(file.endswith('.pdf')):
+        mimetype = 'application/pdf'
+    else:
+        mimetype = 'text/html'
+
+    return mimetype
+
+
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
     connected = True
@@ -19,47 +34,48 @@ def handle_client(conn, addr):
         msg_length = conn.recv(HEADER).decode(FORMAT)
         comm = msg_length.split()
         command = comm[0]
-        print (f'Received from: {conn[0]}:{addr[1]}')
+        print(f'Received from { addr }')
         print(command)
         
         if command == Constantes.GET:
-            file =open(Constantes.PATH + f'/{ comm[1] }') 
+            file = open(Constantes.PATH + f'/{ comm[1] }') 
+            files = file.read()
             try:
-                for line in file:
-                    print(line) 
+                conn.sendall(bytes(files, FORMAT))
                
-            except OSError
-                conn.sendall(bytes(line),FORMAT) 
-                
+            except OSError:
+                conn.send(bytes(f'[305] FILE NOT FOUND', FORMAT))
             else:
-                 conn.send(bytes(f'[305] FILE NOT FOUND', FORMAT))
+                conn.send(bytes(f'[305] ok', FORMAT))
 
-        elif command == Constantes.POST:
-            pass
-
-
-        
-        elif command == Constantes.HEAD:
-            pass
-
-
-
+                
 
         elif command == Constantes.QUIT:
+            print(f'[CLIENT DISCONNECTED] { addr } disconnected')
+            conn.send(bytes(f'[600] DISCONNECTED', FORMAT))
             connected = False
-            pass
 
 
         elif command == Constantes.DELETE:
             file = Constantes.PATH + f'/{ comm[1] }'
             try:
-                pass
                 os.remove(file)
             except OSError:
                 conn.send(bytes(f'[305] FILE NOT FOUND', FORMAT))
             else:
                 conn.send(bytes(f'[201] FILE DELETED', FORMAT))
 
+        elif command == Constantes.PUT:
+            file = comm[1]
+            try:
+                shutil.copy(file, Constantes.PATH)
+            except:
+                conn.send("[401] FAILED TO UPLOAD".encode(FORMAT))
+            else:
+                conn.send("[400] FILE UPLOADED".encode(FORMAT))
+
+        elif command == Constantes.HEAD:
+            pass
 
     conn.close()
         

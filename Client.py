@@ -1,28 +1,52 @@
+from ast import Break
+from email import header
 import socket
+import os
+import Constantes
 
-HEADER = 64
+
+HEADER = 1024
 PORT = 5050
 FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = "!DISCONNECT"
-SERVER = "192.168.1.26"
+SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
 
-def send(msg):
-    message = msg.encode(FORMAT)
-    msg_length = len(message)
-    send_length = str(msg_length).encode(FORMAT)
-    send_length += b' ' * (HEADER - len(send_length))
-    client.send(send_length)
-    client.send(message)
-    print(client.recv(2048).decode(FORMAT))
+def start():
+    print('Client is running...')
+    print('Enter \"quit\" to exit')
+    print('ComMands: GET, HEAD, DELETE, POST, QUIT')
+    print('Input commands:')
+    
+    command = input()
+    while command != Constantes.QUIT:
+        comm = command.split()
+        if command == "":
+            print('Please put a valid comand')
+            command= input
 
-send("Hello World!")
-input()
-send("Hello Everyone!")
-input()
-send("Hello Tim!")
+        elif command == Constantes.GET:
+            client.send(bytes(command, FORMAT))     
+            print(client.recv(HEADER).decode(FORMAT))
 
-send(DISCONNECT_MESSAGE)
+        elif command == Constantes.DELETE:
+            client.send(bytes(command, FORMAT))
+            data_received = client.recv(HEADER,FORMAT)        
+            print(data_received.decode(FORMAT))
+        
+        else:
+            client.send(bytes( command, FORMAT))
+            print(client.recv(HEADER).decode(FORMAT))
+
+    client.send(bytes(command, FORMAT))
+    data_received = client.recv(HEADER,FORMAT)        
+    print(data_received.decode(FORMAT))
+    print('Closing connection...BYE BYE...')
+       
+
+start()
+
+
+
