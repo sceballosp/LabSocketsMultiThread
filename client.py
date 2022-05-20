@@ -26,7 +26,7 @@ def main():
     while loop:
         if command_to_send == '':
             print('Please input a valid command...')
-            command_to_send = input()                        
+            command_to_send = input().split()                        
         
         elif (command_to_send[0] == constants.GET):
 
@@ -70,18 +70,19 @@ def main():
             header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
             print(header)
 
+        elif command_to_send[0] == constants.QUIT:
+            client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
+            header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
+            print(header)
+            print('Closing connection.....')
+            client_socket.close()  
+            loop = False
+            break
+
         print('Commands: GET, POST, HEAD, DELETE')
         print('Input command:')
         command_to_send = input().split()
 
-        if command_to_send[0] == constants.QUIT:
-            loop = False
-
-    client_socket.send(bytes(command_to_send,constants.ENCONDING_FORMAT))
-    data_received = client_socket.recv(constants.RECV_BUFFER_SIZE)        
-    print(data_received.decode(constants.ENCONDING_FORMAT))
-    print('Closing connection...BYE BYE...')
-    client_socket.close()    
 
 if __name__ == '__main__':
     main()
