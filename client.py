@@ -1,4 +1,7 @@
+from hashlib import new
 import socket
+
+from sympy import true
 import constants
 import os
 import requests
@@ -18,7 +21,9 @@ def main():
     print('Input commands:')
     command_to_send = input().split()
 
-    while command_to_send != constants.QUIT:
+    loop = True
+
+    while loop:
         if command_to_send == '':
             print('Please input a valid command...')
             command_to_send = input()                        
@@ -39,6 +44,10 @@ def main():
                     file.write(data_received)
             else:
                 pass
+
+            #print('Press enter to continue')
+            #newLine = input()
+            #print(newLine)
               
         elif (command_to_send[0] == constants.POST):
             client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
@@ -62,8 +71,11 @@ def main():
             print(header)
 
         print('Commands: GET, POST, HEAD, DELETE')
-        print('Input commands:')
-        command_to_send = input()
+        print('Input command:')
+        command_to_send = input().split()
+
+        if command_to_send[0] == constants.QUIT:
+            loop = False
 
     client_socket.send(bytes(command_to_send,constants.ENCONDING_FORMAT))
     data_received = client_socket.recv(constants.RECV_BUFFER_SIZE)        
