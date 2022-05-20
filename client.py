@@ -24,11 +24,8 @@ def main():
     loop = True
 
     while loop:
-        if command_to_send == '':
-            print('Please input a valid command...')
-            command_to_send = input().split()                        
-        
-        elif (command_to_send[0] == constants.GET):
+                              
+        if (command_to_send[0] == constants.GET):
 
             client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
             header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
@@ -78,6 +75,9 @@ def main():
             client_socket.close()  
             loop = False
             break
+
+        else:
+            print('Please input a valid command...')
 
         print('Commands: GET, POST, HEAD, DELETE')
         print('Input command:')
