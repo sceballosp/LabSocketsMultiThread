@@ -27,38 +27,44 @@ def handler_client_connection(client_connection,client_address):
         command = remote_command[0]
         print (f'Data received from: {client_address[0]}:{client_address[1]}')
         print(command)
-        
+
+#--------------------------------------------------------------------------------------
+
         if (command == constants.GET):
-            try:
-                client_connection.sendall(remote_command[1].encode(constants.ENCONDING_FORMAT)) #sending file name
-            
-                data = requests.GET_request(remote_command[1])
-        
+            header = requests.HEAD_request(remote_command[1])
+
+            if header != '[HTTP/1.1 404 Not Found]':
+                client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+                client_connection.sendall(remote_command[1].encode(constants.ENCONDING_FORMAT)) #send file name
+                data = requests.GET_request(remote_command[1]) #send data
                 client_connection.sendall(data)
-            except OSError:
-                client_connection.send(bytes('mal', constants.ENCONDING_FORMAT))
+            
             else:
-                client_connection.send(bytes('ok', constants.ENCONDING_FORMAT))
+                client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+#--------------------------------------------------------------------------------------
 
+        elif (command == constants.POST):
+            header = requests.HEAD_request(remote_command[1])
 
+            if header != '[HTTP/1.1 404 Not Found]':
+                client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+                client_connection.sendall(remote_command[1].encode(constants.ENCONDING_FORMAT)) #send file name
+                data = requests.POST_request(remote_command[1]) #send data
+                client_connection.sendall(data)
+            
+            else:
+                client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+#--------------------------------------------------------------------------------------
+
+        elif (command == constants.HEAD):
+            header = requests.HEAD_request(remote_command[1])
+            client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+#--------------------------------------------------------------------------------------
+        
         elif (command == constants.QUIT):
             response = '200 BYE\n'
             client_connection.sendall(response.encode(constants.ENCONDING_FORMAT))
             is_connected = False
-
-
-        elif (command == constants.POST):
-            try:
-                client_connection.sendall(remote_command[1].encode(constants.ENCONDING_FORMAT)) #sending file name
-            
-                data = requests.POST_request(remote_command[1])
-        
-                client_connection.sendall(data)
-
-            except OSError:
-                client_connection.send(bytes('mal', constants.ENCONDING_FORMAT))
-            else:
-                client_connection.send(bytes('ok', constants.ENCONDING_FORMAT))
             
 
         else:
