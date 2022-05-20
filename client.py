@@ -1,7 +1,8 @@
 import socket
-
+import validators
 import constants
 import os
+from urllib.request import urlopen
 import requests
 
 save_path = 'C:/Users/samue/OneDrive/Escritorio/clientFiles/'
@@ -25,24 +26,34 @@ def main():
                               
         if (command_to_send[0] == constants.GET):
 
-            client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
-            header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
-            print(header)
+            if validators.url(command_to_send[1]) == True:
+                r = urlopen(command_to_send[1])
 
-            if header != '[HTTP/1.1 404 Not Found]':
-                filename = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive filename
-                completeName = os.path.join(save_path, filename)
-                
-                with open(completeName, "wb") as file:
+                with open("index.html", "wb") as f:
+                    f.write(r.read())
 
-                    data_received = client_socket.recv(constants.RECV_BUFFER_SIZE) #receive data
-                    file.write(data_received)
+                print(f"{command_to_send[1]} - {len(r.read())} bytes")
+
+
             else:
-                pass
+                client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
+                header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
+                print(header)
 
-            #print('Press enter to continue')
-            #newLine = input()
-            #print(newLine)
+                if header != '[HTTP/1.1 404 Not Found]':
+                    filename = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive filename
+                    completeName = os.path.join(save_path, filename)
+                    
+                    with open(completeName, "wb") as file:
+
+                        data_received = client_socket.recv(constants.RECV_BUFFER_SIZE) #receive data
+                        file.write(data_received)
+                else:
+                    pass
+
+                #print('Press enter to continue')
+                #newLine = input()
+                #print(newLine)
 #--------------------------------------------------------------------------------------
 
         elif (command_to_send[0] == constants.POST):
