@@ -12,4 +12,3 @@ def POST_request(fileName):
     data = file.read(constants.RECV_BUFFER_SIZE)
   
   return data
-  

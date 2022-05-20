@@ -3,7 +3,7 @@ ENCONDING_FORMAT = "utf-8"
 RECV_BUFFER_SIZE = 1000000
 IP_SERVER = '127.0.0.1'
 
-FILE_DIRECTORY = 'C:/Users/Laura/Desktop/Universidad/Telematica/TestProyecto/files/'
+FILE_DIRECTORY = 'C:/Users/samue/OneDrive/Escritorio/Telematica/LabSocketsMultiThread/serverFiles/'
 
 #requests
 HELO = 'HELO'
