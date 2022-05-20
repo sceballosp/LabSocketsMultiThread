@@ -24,3 +24,15 @@ def HEAD_request(fileName):
   except:
     header = '[HTTP/1.1 404 Not Found]'
     return header
+
+
+def HEAD_POST_request(fileName):
+
+  try: 
+    fileSize = os.path.getsize(client.save_path + fileName)
+    header = f'[HTTP/1.1 200 OK - {fileName} - {fileSize} bytes]'
+    return header
+  
+  except:
+    header = '[HTTP/1.1 404 Not Found]'
+    return header

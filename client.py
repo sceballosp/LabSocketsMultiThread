@@ -1,7 +1,5 @@
-from hashlib import new
 import socket
 
-from sympy import true
 import constants
 import os
 import requests
@@ -45,7 +43,8 @@ def main():
             #print('Press enter to continue')
             #newLine = input()
             #print(newLine)
-              
+#--------------------------------------------------------------------------------------
+
         elif (command_to_send[0] == constants.POST):
             client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
             header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
@@ -53,7 +52,7 @@ def main():
 
             if header != '[HTTP/1.1 404 Not Found]':
                 filename = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive filename
-                completeName = os.path.join(save_path, filename)
+                completeName = os.path.join(constants.FILE_DIRECTORY, filename)
                 
                 with open(completeName, "wb") as file:
 
@@ -61,11 +60,22 @@ def main():
                     file.write(data_received)
             else:
                 pass
-        
+#--------------------------------------------------------------------------------------
+
         elif (command_to_send[0] == constants.HEAD):
             client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
             header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
             print(header)
+#--------------------------------------------------------------------------------------
+
+        elif (command_to_send[0] == constants.DELETE):
+            client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))
+            header = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive header
+            response = client_socket.recv(constants.RECV_BUFFER_SIZE).decode(constants.ENCONDING_FORMAT) #receive response
+            print(header)
+            print(response)
+#--------------------------------------------------------------------------------------
+
 
         elif command_to_send[0] == constants.QUIT:
             client_socket.send(bytes(' '.join(command_to_send), constants.ENCONDING_FORMAT))

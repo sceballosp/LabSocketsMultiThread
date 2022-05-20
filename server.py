@@ -44,7 +44,7 @@ def handler_client_connection(client_connection,client_address):
 #--------------------------------------------------------------------------------------
 
         elif (command == constants.POST):
-            header = requests.HEAD_request(remote_command[1])
+            header = requests.HEAD_POST_request(remote_command[1])
 
             if header != '[HTTP/1.1 404 Not Found]':
                 client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
@@ -59,6 +59,19 @@ def handler_client_connection(client_connection,client_address):
         elif (command == constants.HEAD):
             header = requests.HEAD_request(remote_command[1])
             client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+#--------------------------------------------------------------------------------------
+
+        elif (command == constants.DELETE):
+            header = requests.HEAD_request(remote_command[1])
+
+            if header != '[HTTP/1.1 404 Not Found]':
+                client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+                os.remove(constants.FILE_DIRECTORY + remote_command[1])
+                client_connection.sendall('File deleted'.encode(constants.ENCONDING_FORMAT)) #send response
+            
+            else:
+                client_connection.sendall(header.encode(constants.ENCONDING_FORMAT)) #send header
+                client_connection.sendall('File not deleted'.encode(constants.ENCONDING_FORMAT)) #send response
 #--------------------------------------------------------------------------------------
         
         elif (command == constants.QUIT):
